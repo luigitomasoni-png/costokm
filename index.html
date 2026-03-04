@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CostoKm - CRI Merate</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#e30613">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon.svg">
+</head>
+
+<body>
+    <div class="app-container">
+        <header style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+            <span style="font-size: 2.5rem;">🚑</span>
+            <div style="text-align: left;">
+                <h1 style="margin: 0; line-height: 1.2;">Costo Km</h1>
+                <p style="margin: 0; line-height: 1.2;">Calcolo Preventivo</p>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button type="button" class="tab-btn active" data-target="view-manuale">🔢 Veloce (Km)</button>
+            <button type="button" class="tab-btn" data-target="view-semplice">📍 Semplice A/R</button>
+            <button type="button" class="tab-btn" data-target="view-multi">🗺️ Multi-Tappa</button>
+        </div>
+
+        <main>
+            <!-- VISTA MANUALE (KM CONTACHILOMETRI O DIRETTO) -->
+            <div id="view-manuale" class="view-section active">
+                <form id="form-manuale">
+                    <p class="tab-desc">Compila i campi e seleziona il mezzo utilizzato.</p>
+
+                    <div class="form-row-multi">
+                        <div class="form-group highlight-partenza">
+                            <label for="km-partenza">🟢 Partenza (Rapportino)</label>
+                            <input type="number" id="km-partenza" placeholder="Es. 150000" required>
+                        </div>
+
+                        <div class="form-group highlight-arrivo">
+                            <label for="km-arrivo">🔴 Arrivo (ContaKm)</label>
+                            <input type="number" id="km-arrivo" placeholder="Es. 150020" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🚐 Mezzo</label>
+                        <div class="radio-group">
+                            <label class="radio-card">
+                                <input type="radio" name="mezzo-manuale" value="ABZ">
+                                <span class="radio-label">Ambulanza (ABZ)</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="mezzo-manuale" value="Doblò">
+                                <span class="radio-label">Doblò / Auto</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-calc">🖩 Calcola Preventivo</button>
+                </form>
+            </div>
+
+            <!-- VISTA A/R SEMPLICE (MAPS) -->
+            <div id="view-semplice" class="view-section">
+                <form id="form-semplice">
+
+                    <div class="form-group highlight-partenza">
+                        <label>🟢 Partenza</label>
+                        <div class="address-row" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" id="partenza-semplice-citta" placeholder="Città" style="flex: 1;"
+                                required>
+                        </div>
+                        <input type="text" id="partenza-semplice-via" placeholder="Via e civico (opzionale)"
+                            style="width: 100%;">
+                    </div>
+
+                    <div class="form-group highlight-arrivo">
+                        <label>🔴 Arrivo</label>
+                        <div class="address-row" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" id="arrivo-semplice-citta" placeholder="Città" style="flex: 1;" required>
+                        </div>
+                        <input type="text" id="arrivo-semplice-via" placeholder="Via e civico (opzionale)"
+                            style="width: 100%;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>🚐 Mezzo</label>
+                        <div class="radio-group">
+                            <label class="radio-card">
+                                <input type="radio" name="mezzo-semplice" value="ABZ">
+                                <span class="radio-label">Ambulanza (ABZ)</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="mezzo-semplice" value="Doblò">
+                                <span class="radio-label">Doblò / Auto</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-calc">🖩 Calcola Preventivo (Mappe)</button>
+                </form>
+            </div>
+
+            <!-- VISTA MULTI-TAPPA (MAPS) -->
+            <div id="view-multi" class="view-section">
+                <form id="form-multi">
+                    <p class="tab-desc">Aggiungi tutte le tappe intermedie. La partenza e il ritorno in sede (Olgiate)
+                        sono automatici.</p>
+
+                    <div id="multi-stops-container">
+                        <div class="multi-stop-row highlight-partenza">
+                            <label>🟢 Tappa 1</label>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <input type="text" class="stop-input-citta" placeholder="Città" required>
+                                <input type="text" class="stop-input-via" placeholder="Via e civico (opzionale)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="btn-add-stop" class="btn-secondary" style="margin-bottom: 1rem;">➕
+                        Aggiungi Tappa</button>
+
+                    <div class="form-group">
+                        <label>🚐 Mezzo</label>
+                        <div class="radio-group">
+                            <label class="radio-card">
+                                <input type="radio" name="mezzo-multi" value="ABZ">
+                                <span class="radio-label">Ambulanza (ABZ)</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="mezzo-multi" value="Doblò">
+                                <span class="radio-label">Doblò / Auto</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-calc">🖩 Calcola Intero Percorso</button>
+                </form>
+            </div>
+
+            <!-- CONTENITORE RISULTATO (GLOBALE) -->
+            <div id="result-container" class="hidden" style="margin-top: 2rem;">
+                <div class="result-card">
+                    <h3>Preventivo Stimato</h3>
+                    <div class="price" id="prezzo">-- €</div>
+
+                    <div class="details">
+                        <div class="detail-item">
+                            <span>Km Percorsi A/R:</span>
+                            <span id="km-totali">--</span>
+                        </div>
+                        <div class="route-info" id="percorso-dettaglio">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                    <button id="btn-maps" class="btn-maps hidden">🗺️ Apri in Maps</button>
+                    <!-- <button id="btn-nuovo" class="btn-secondary">🔄 Chiudi e Modifica</button> -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="hidden"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
