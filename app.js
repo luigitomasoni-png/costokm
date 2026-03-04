@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(error.message);
         } finally {
             btnCalc.disabled = false;
-            btnCalc.innerHTML = "🖩 Calcola Preventivo (Mappe)";
+            btnCalc.innerHTML = "🖩 Calcola Preventivo";
         }
     });
 
