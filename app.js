@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(error.message);
         } finally {
             btnCalc.disabled = false;
-            btnCalc.innerHTML = "🖩 Calcola Preventivo";
+            btnCalc.innerHTML = "Calcola Preventivo";
         }
     });
 
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(error.message);
         } finally {
             btnCalc.disabled = false;
-            btnCalc.innerHTML = "🖩 Calcola Intero Percorso";
+            btnCalc.innerHTML = "Calcola Intero Percorso";
         }
 
     });
