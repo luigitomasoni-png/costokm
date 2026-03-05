@@ -45,12 +45,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---- FUNZIONE CALCOLO PREZZO (COMUNE) ----
     function applyPricing(km, mezzo) {
-        let base = (mezzo === 'ABZ') ? 50 : 40;
-        let cost = base;
-        if (km > 15) {
-            cost += (km - 15);
-        }
-        return Math.ceil(cost);
+        const basePrice = (mezzo === 'ABZ') ? 50 : 40;
+        const extraKm = Math.max(0, km - 15);
+        const total = basePrice + extraKm;
+
+        const breakdown = `Base (primi 15km): ${basePrice}€` +
+            (extraKm > 0 ? ` + Extra (${Math.ceil(extraKm)} km * 1€): ${Math.ceil(extraKm)}€` : "");
+
+        return {
+            total: Math.ceil(total),
+            breakdown: breakdown
+        };
     }
 
     // ---- VISTA 1: MANUALE (KM CONTACHILOMETRI) ----
@@ -72,20 +77,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Calcolo della distanza (Solo andata e ritorno se moltiplicato per 2)
-        const percorsoSingolo = (endKm - startKm);
+        // Calcolo della distanza (Differenza chilometrica)
+        const totalKm = (endKm - startKm);
 
-        // COME RICHIESTO: l'APP li raddoppia e fa il calcolo
-        const totalKm = percorsoSingolo * 2;
+        const pricing = applyPricing(totalKm, mezzo);
 
-        const price = applyPricing(totalKm, mezzo);
-
+        document.getElementById('label-km-totali').textContent = "Km Percorsi:";
         document.getElementById('km-totali').textContent = totalKm + " Km";
-        document.getElementById('prezzo').textContent = price + " €";
+        document.getElementById('prezzo').textContent = pricing.total + " €";
 
         resultDettaglio.innerHTML = `
-            <div style="margin-bottom:2px;"><strong>Distanza km/Inserita:</strong> ${percorsoSingolo} Km</div>
-            <div><strong>Fattore A/R:</strong> Moltiplicato x 2.0</div>
+            <div style="background: #f5f5f5; padding: 10px; border-radius: 8px; border-left: 4px solid #888; font-size: 0.9rem; color: #444;">
+                <strong>Dettaglio costi:</strong><br>${pricing.breakdown}
+            </div>
         `;
 
         btnMaps.classList.add('hidden'); // Non usiamo maps in questa vista
@@ -132,20 +136,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const dist3 = await getRoadDistance(arrCoords, hqCoords);
 
             const totalKm = Math.ceil(dist1 + dist2 + dist3);
-            const price = applyPricing(totalKm, mezzo);
+            const pricing = applyPricing(totalKm, mezzo);
 
+            document.getElementById('label-km-totali').textContent = "Km Percorsi A/R:";
             document.getElementById('km-totali').textContent = totalKm + " Km";
-            document.getElementById('prezzo').textContent = price + " €";
+            document.getElementById('prezzo').textContent = pricing.total + " €";
 
-            let detailHtml = "";
+            let infoHtml = "";
             if (dist1 > 0.1) {
-                detailHtml += `<div style="margin-bottom: 4px;"><strong>Sede CRI</strong> &rarr; ${escapeHtml(displayName(partenza))} (${dist1.toFixed(1)} km)</div>`;
+                infoHtml += `<div style="margin-bottom: 4px;"><strong>Sede CRI</strong> &rarr; ${escapeHtml(displayName(partenza))} (${dist1.toFixed(1)} km)</div>`;
             }
-            detailHtml += `<div style="margin-bottom: 4px;"><strong>${escapeHtml(displayName(partenza))}</strong> &rarr; ${escapeHtml(displayName(arrivo))} (${dist2.toFixed(1)} km)</div>`;
+            infoHtml += `<div style="margin-bottom: 4px;"><strong>${escapeHtml(displayName(partenza))}</strong> &rarr; ${escapeHtml(displayName(arrivo))} (${dist2.toFixed(1)} km)</div>`;
             if (dist3 > 0.1) {
-                detailHtml += `<div><strong>${escapeHtml(displayName(arrivo))}</strong> &rarr; Sede CRI (${dist3.toFixed(1)} km)</div>`;
+                infoHtml += `<div style="margin-bottom: 8px;"><strong>${escapeHtml(displayName(arrivo))}</strong> &rarr; Sede CRI (${dist3.toFixed(1)} km)</div>`;
             }
-            resultDettaglio.innerHTML = detailHtml;
+
+            infoHtml += `
+                <div style="background: #f5f5f5; padding: 10px; border-radius: 8px; border-left: 4px solid #888; font-size: 0.9rem; color: #444;">
+                    <strong>Dettaglio costi:</strong><br>${pricing.breakdown}
+                </div>
+            `;
+            resultDettaglio.innerHTML = infoHtml;
 
             lastRouteNames = [HQ_ADDRESS, partenza, arrivo, HQ_ADDRESS];
             btnMaps.classList.remove('hidden');
@@ -250,12 +261,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             totalKm = Math.ceil(totalKm);
-            const price = applyPricing(totalKm, mezzo);
+            const pricing = applyPricing(totalKm, mezzo);
 
+            document.getElementById('label-km-totali').textContent = "Km Percorsi A/R:";
             document.getElementById('km-totali').textContent = totalKm + " Km";
-            document.getElementById('prezzo').textContent = price + " €";
+            document.getElementById('prezzo').textContent = pricing.total + " €";
 
-            resultDettaglio.innerHTML = segments.map(s => `<div style="margin-bottom:4px;">${s}</div>`).join('');
+            let segmentsHtml = segments.map(s => `<div style="margin-bottom:4px;">${s}</div>`).join('');
+            segmentsHtml += `
+                <div style="margin-top: 8px; background: #f5f5f5; padding: 10px; border-radius: 8px; border-left: 4px solid #888; font-size: 0.9rem; color: #444;">
+                    <strong>Dettaglio costi:</strong><br>${pricing.breakdown}
+                </div>
+            `;
+            resultDettaglio.innerHTML = segmentsHtml;
 
             lastRouteNames = [HQ_ADDRESS, ...inputs, HQ_ADDRESS];
             btnMaps.classList.remove('hidden');
